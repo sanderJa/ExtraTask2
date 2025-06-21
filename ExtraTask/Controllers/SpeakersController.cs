@@ -18,10 +18,22 @@ public class SpeakersController(IDbService service) : ControllerBase
     [HttpPost("create")]
     public async Task<IActionResult> CreateSpeakerAsync([FromBody] SpeakerCreateDto dto)
     {
-        var id = await service.CreateSpeakerAsync(dto);
-        return CreatedAtAction(nameof(GetSpeaker), new { id }, dto);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var id = await service.CreateSpeakerAsync(dto);
+            return CreatedAtAction(nameof(GetSpeaker), new { id }, dto);
+        }
+        catch
+        {
+            return StatusCode(500, "Internal server error");
+        }
     }
-    
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetSpeaker(int id)
     {

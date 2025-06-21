@@ -55,9 +55,15 @@ public class EventsController(IDbService service) : ControllerBase
             return StatusCode(500, "Internal server error");
         }
     }
+
     [HttpPost("create-event")]
     public async Task<IActionResult> CreateEvent([FromBody] CreateEventDto dto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         try
         {
             var createdEvent = await service.CreateEventAsync(dto);
@@ -68,7 +74,7 @@ public class EventsController(IDbService service) : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-    
+
     [HttpGet("events/{id}")]
     public async Task<IActionResult> GetEvent(int id)
     {

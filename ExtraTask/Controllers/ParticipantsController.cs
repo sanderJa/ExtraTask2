@@ -32,7 +32,19 @@ public class ParticipantsController(IDbService service) : ControllerBase
     [HttpPost("create")]
     public async Task<IActionResult> CreateParticipantAsync([FromBody] ParticipantCreateDto dto)
     {
-        var id = await service.CreateParticipantAsync(dto);
-        return CreatedAtAction(nameof(GetParticipant), new { id }, dto);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var id = await service.CreateParticipantAsync(dto);
+            return CreatedAtAction(nameof(GetParticipant), new { id }, dto);
+        }
+        catch
+        {
+            return StatusCode(500, "Internal server error");
+        }
     }
 }
